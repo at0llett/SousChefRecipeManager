@@ -1,0 +1,92 @@
+﻿@page "/"
+@inject DataService DataService
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<EditForm Model="checkUser" OnValidSubmit="CheckUser" FormName="checkUserForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div>
+        <label>Email: </label>
+        <InputText @bind-Value="checkUser.email" />
+    </div>
+    <div>
+        <label>Password: </label>
+        <InputText @bind-Value="checkUser.password" />
+    </div>
+
+    <button type="submit">Log In</button>
+</EditForm>
+
+<br/>
+
+@if (isSubmitted)
+{
+    @if (users != null && users.Count > 0)
+    {
+        <h3>Welcome, @users[0].username. You have successfully logged in!</h3>
+    }
+    else
+    {
+        <h3>You do not exist!</h3>
+    }
+}
+
+<br/>
+
+@* <EditForm Model="newUser" OnValidSubmit="InsertUser" FormName="insertUserForm"> *@
+@*     <DataAnnotationsValidator /> *@
+@*     <ValidationSummary /> *@
+@* *@
+@*     <div> *@
+@*         <label>Username: </label> *@
+@*         <InputText @bind-Value="newUser.username" /> *@
+@*     </div> *@
+@*     <div> *@
+@*         <label>Email: </label> *@
+@*         <InputText @bind-Value="newUser.email" /> *@
+@*     </div> *@
+@*     <div> *@
+@*         <label>Password: </label> *@
+@*         <InputText @bind-Value="newUser.password" /> *@
+@*     </div> *@
+@* *@
+@*     <button type="submit">Insert</button> *@
+@* </EditForm> *@
+
+
+@* @foreach (var item in users) *@
+@* { *@
+@*     <p>Hello @item.username. Your email is @item.email.</p> *@
+@* } *@
+
+@code {
+    private List<UsersClass> users = new List<UsersClass>();
+
+    private string _cmd = "SELECT * FROM users";
+
+    private UsersClass newUser = new UsersClass();
+    private UsersClass checkUser = new UsersClass();
+
+    private bool isSubmitted = false;
+
+    private async Task CheckUser()
+    {
+        isSubmitted = true;
+        users = await DataService.CheckUserAsync(checkUser.email, checkUser.password);
+    }
+    
+    private async Task InsertUser()
+    {
+        await DataService.InsertUserAsync(newUser);
+        users = await DataService.GetDataAsync(_cmd);
+        //StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await DataService.GetDataAsync(_cmd);
+    }
+}

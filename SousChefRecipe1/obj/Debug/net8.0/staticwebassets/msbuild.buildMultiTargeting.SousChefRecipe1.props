@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\SousChefRecipe1.props" />
+</Project>
